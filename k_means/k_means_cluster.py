@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
+from sklearn.preprocessing import MinMaxScaler
 
 
 
@@ -46,21 +47,33 @@ data_dict.pop("TOTAL", 0)
 # find the range of exercised_stock_options
 lowest_stock_option = 1e10
 highest_stock_option = 0
+lowest_salary = 1e10
+highest_salary = 0
 
 for person in data_dict:
-    stock_options = data_dict[person]['salary']
+    stock_options = data_dict[person]['exercised_stock_options']
 
     if stock_options != 'NaN':
         if stock_options > highest_stock_option:
-            print person
             highest_stock_option = stock_options
 
         if stock_options < lowest_stock_option:
             lowest_stock_option = stock_options
 
-print highest_stock_option
-print "lowest: ", lowest_stock_option
+for person in data_dict:
+    salary = data_dict[person]['salary']
 
+    if salary != 'NaN':
+        if salary > highest_salary:
+            highest_salary = salary
+
+        if salary < lowest_salary:
+            lowest_salary = salary
+
+print "highest_stock_option: ", highest_stock_option
+print "lowest_stock_option: ", lowest_stock_option
+print "highest salary: ", highest_stock_option
+print "lowest_ salary: ", lowest_stock_option
 
 ### the input features we want to use 
 ### can be any key in the person-level dictionary (salary, director_fees, etc.) 
@@ -95,3 +108,9 @@ try:
     Draw(pred, finance_features, poi, mark_poi=False, name="clusters.pdf", f1_name=feature_1, f2_name=feature_2)
 except NameError:
     print "no predictions object named pred found, no clusters to plot"
+
+# Feature Scaling
+scaler = MinMaxScaler()
+print "Rescaled $200 000: ", scaler.fit_transform([[float(lowest_salary)], [200000], [float(highest_salary)]]) # 0.17962407 (holy cow, a $200 000 salary is on the low end), I guess that makes sense compared to a million that Skillings had
+
+print "Rescaled $1 000 000: ", scaler.fit_transform([[float(lowest_stock_option)], [1000000], [float(highest_stock_option)]]) # holy sh*t, 0.02902059, a million dollars is 2% of what someone else got
