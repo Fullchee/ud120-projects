@@ -43,6 +43,24 @@ data_dict = pickle.load( open("../final_project/final_project_dataset.pkl", "r")
 ### there's an outlier--remove it! 
 data_dict.pop("TOTAL", 0)
 
+# find the range of exercised_stock_options
+lowest_stock_option = 1e10
+highest_stock_option = 0
+
+for person in data_dict:
+    stock_options = data_dict[person]['salary']
+
+    if stock_options != 'NaN':
+        if stock_options > highest_stock_option:
+            print person
+            highest_stock_option = stock_options
+
+        if stock_options < lowest_stock_option:
+            lowest_stock_option = stock_options
+
+print highest_stock_option
+print "lowest: ", lowest_stock_option
+
 
 ### the input features we want to use 
 ### can be any key in the person-level dictionary (salary, director_fees, etc.) 
@@ -64,8 +82,11 @@ plt.show()
 
 ### cluster here; create predictions of the cluster labels
 ### for the data and store them to a list called pred
+from sklearn.cluster import KMeans
 
-
+kmeans = KMeans(n_clusters=2)
+kmeans.fit(finance_features)
+pred = kmeans.predict(finance_features)
 
 
 ### rename the "name" parameter when you change the number of features
