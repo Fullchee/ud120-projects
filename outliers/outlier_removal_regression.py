@@ -26,6 +26,19 @@ ages_train, ages_test, net_worths_train, net_worths_test = train_test_split(ages
 ### fill in a regression here!  Name the regression object reg so that
 ### the plotting code below works, and you can see what your regression looks like
 
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+reg = LinearRegression()
+reg.fit(ages_train, net_worths_train)
+
+print "Coef: ", reg.coef_ # with the outliers, it's 5.078 instead of 6.5
+
+# pred_with_outliers = reg.predict(ages_test)
+
+# print "R2 with outliers: ", r2_score(net_worths_test, pred_with_outliers) # 0.878, pretty good
+
+
 
 
 
@@ -49,7 +62,8 @@ cleaned_data = []
 try:
     predictions = reg.predict(ages_train)
     cleaned_data = outlierCleaner( predictions, ages_train, net_worths_train )
-except NameError:
+except NameError as e:
+    print e
     print "your regression object doesn't exist, or isn't name reg"
     print "can't make predictions to use in identifying outliers"
 
@@ -68,7 +82,11 @@ if len(cleaned_data) > 0:
     ### refit your cleaned data!
     try:
         reg.fit(ages, net_worths)
+        print "New coef after cleaning the data ", reg.coef_
         plt.plot(ages, reg.predict(ages), color="blue")
+        pred_no_outliers = reg.predict(ages_test)
+
+        print "R2 with outliers: ", r2_score(net_worths_test, pred_no_outliers) # wow: 0.983
     except NameError:
         print "you don't seem to have regression imported/created,"
         print "   or else your regression object isn't named reg"
